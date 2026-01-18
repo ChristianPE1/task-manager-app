@@ -1,33 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router';
+import { Link } from 'react-router';
 import { taskService, projectService } from '../services/api';
+import { type Project, type Task} from '../types/projects';
 
-interface Task {
-    id: number;
-    title: string;
-    description: string;
-    status: 'pending' | 'in_progress' | 'done' | 'overdue';
-    priority: 'low' | 'medium' | 'high';
-    due_date: string;
-    project: {
-        id: number;
-        name: string;
-    };
-    assignee: {
-        id: number;
-        name: string;
-        email: string;
-    };
-}
 
-interface Project {
-    id: number;
-    name: string;
-}
+type ProjectSummary = Pick<Project, 'id' | 'name'>;
 
 export default function TasksPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<ProjectSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
@@ -46,7 +27,6 @@ export default function TasksPage() {
     const [dueDate, setDueDate] = useState('');
     const [submitting, setSubmitting] = useState(false);
     
-    const navigate = useNavigate();
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
     useEffect(() => {
@@ -314,9 +294,11 @@ export default function TasksPage() {
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
                                         <h3 className="text-xl font-bold mb-1">{task.title}</h3>
+                                        {task.project && (
                                         <p className="text-sm text-gray-600 mb-2">
                                             Proyecto: {task.project.name}
                                         </p>
+                                        )}
                                     </div>
                                     <div className="flex gap-2">
                                         <Link
@@ -345,9 +327,11 @@ export default function TasksPage() {
                                 <p className="text-sm text-gray-500">
                                     Vence: {new Date(task.due_date).toLocaleDateString('es-ES')}
                                 </p>
-                                <p className="text-sm text-gray-500">
-                                    Asignado a: {task.assignee.name}
-                                </p>
+                                {task.assignee && (
+                                    <p className="text-sm text-gray-500">
+                                        Asignado a: {task.assignee.name}
+                                    </p>
+                                )}
                             </div>
                         ))
                     )}

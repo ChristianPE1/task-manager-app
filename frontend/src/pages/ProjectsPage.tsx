@@ -1,18 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { projectService } from '../services/api';
-
-interface Project {
-    id: number;
-    name: string;
-    description: string;
-    owner: {
-        id: number;
-        name: string;
-        email: string;
-    };
-    created_at: string;
-}
+import { type Project } from '../types/projects';
 
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<Project[]>([]);
