@@ -156,7 +156,7 @@ export default function ProjectsPage() {
                                         <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
                                             {project.owner && project.owner.name ? project.owner.name.charAt(0).toUpperCase() : '?'}
                                         </div>
-                                        <span className="text-xs text-gray-500 truncate max-w-[100px]">{project.owner?.name}</span>
+                                        <span className="text-xs text-gray-500 truncate max-w-25">{project.owner?.name}</span>
                                     </div>
                                     <div className="flex gap-2">
                                         <Link

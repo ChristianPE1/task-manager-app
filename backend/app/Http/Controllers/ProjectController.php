@@ -5,17 +5,22 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
+use App\Repositories\Interfaces\ProjectRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 class ProjectController extends Controller
 {
+    public function __construct(
+        protected ProjectRepositoryInterface $projectRepository
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index(): JsonResponse
     {
-        $projects = Project::with('owner:id,name,email')->get();
+        $projects = $this->projectRepository->getAll();
 
         return response()->json([
             'data' => $projects,
@@ -27,7 +32,7 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request): JsonResponse
     {
-        $project = Project::create([
+        $project = $this->projectRepository->create([
             ...$request->validated(),
             'owner_id' => $request->user()->id,
         ]);
@@ -41,36 +46,54 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project): JsonResponse
+    public function show(int $id): JsonResponse
     {
+        $project = $this->projectRepository->getById($id);
+
+        if (!$project) {
+            return response()->json(['message' => 'Project not found'], 404);
+        }
+
         return response()->json([
-            'data' => $project->load(['owner:id,name,email', 'tasks']),
+            'data' => $project,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
+    public function update(UpdateProjectRequest $request, int $id): JsonResponse
     {
+        $project = $this->projectRepository->getById($id);
+
+        if (!$project) {
+            return response()->json(['message' => 'Project not found'], 404);
+        }
+
         Gate::authorize('update', $project);
 
-        $project->update($request->validated());
+        $this->projectRepository->update($id, $request->validated());
 
         return response()->json([
             'message' => 'Project updated successfully',
-            'data' => $project->fresh()->load('owner:id,name,email'),
+            'data' => $this->projectRepository->getById($id),
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Project $project): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
+        $project = $this->projectRepository->getById($id);
+
+        if (!$project) {
+            return response()->json(['message' => 'Project not found'], 404);
+        }
+
         Gate::authorize('delete', $project);
 
-        $project->delete();
+        $this->projectRepository->delete($id);
 
         return response()->json([
             'message' => 'Project deleted successfully',
