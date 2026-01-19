@@ -6,9 +6,9 @@ export default function Layout() {
 
 
     return (
-        <div className="min-h-screen flex flex-col items-center bg-slate-900">
+        <div className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-800 font-sans">
             <NavBar />
-            <main>
+            <main className="w-full flex justify-center">
                 <Outlet />
             </main>
         </div>

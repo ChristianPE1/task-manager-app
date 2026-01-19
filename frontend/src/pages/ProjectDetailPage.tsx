@@ -55,84 +55,98 @@ export default function ProjectDetailPage() {
     }
 
     if (!project) {
-        return <div className="text-center py-10">Proyecto no encontrado</div>;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] text-gray-500">
+                <p className="text-xl font-medium">Proyecto no encontrado</p>
+                <button onClick={() => navigate('/projects')} className="mt-4 text-indigo-600 hover:underline">
+                    Volver a proyectos
+                </button>
+            </div>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="bg-white shadow mb-6">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <div className="flex items-center gap-4">
+        <div className="min-h-screen bg-gray-50 w-full animate-fade-in-up">
+            <div className="bg-white border-b border-gray-200 shadow-sm">
+                <div className="max-w-6xl mx-auto px-6 py-6 flex lg:flex-row flex-col gap-4 justify-between items-start lg:items-center">
+                    <div className="flex flex-col gap-1">
                         <button
                             onClick={() => navigate('/projects')}
-                            className="text-blue-500 hover:underline"
+                            className="text-gray-500 hover:text-indigo-600 flex items-center gap-1 text-sm font-medium transition-colors mb-2 w-fit"
                         >
-                            ← Volver
+                            ← Volver a Proyectos
                         </button>
-                        <h1 className="text-2xl font-bold">{project.name}</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{project.name}</h1>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-xs font-semibold">ACTIVO</span>
+                            <span>•</span>
+                            <span>Creado por {project.owner.name}</span>
+                        </div>
                     </div>
+                    {!editing && (
+                        <button
+                            onClick={() => setEditing(true)}
+                            className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium shadow-sm hover:bg-gray-50 hover:text-indigo-600 transition-all flex items-center gap-2"
+                        >
+                            Editar Proyecto
+                        </button>
+                    )}
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="max-w-6xl mx-auto px-6 py-8">
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 text-sm">
                         {error}
                     </div>
                 )}
 
-                <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
                     {editing ? (
-                        <form onSubmit={handleUpdate}>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 mb-2">Nombre</label>
+                        <form onSubmit={handleUpdate} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Proyecto</label>
                                 <input
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg"
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                                     required
                                 />
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-gray-700 mb-2">Descripción</label>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                                 <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-lg"
-                                    rows={3}
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                    rows={4}
                                 />
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-3 pt-2">
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/20"
                                 >
-                                    {submitting ? 'Guardando...' : 'Guardar'}
+                                    {submitting ? 'Guardando...' : 'Guardar Cambios'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setEditing(false)}
-                                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                                    className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                                 >
                                     Cancelar
                                 </button>
                             </div>
                         </form>
                     ) : (
-                        <>
-                            <p className="text-gray-700 mb-4">{project.description || 'Sin descripción'}</p>
-                            <p className="text-sm text-gray-500 mb-4">
-                                Creado por: {project.owner.name} ({project.owner.email})
+                        <div className="prose max-w-none">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Sobre este proyecto</h3>
+                            <p className="text-gray-600 leading-relaxed text-lg">
+                                {project.description || <span className="italic text-gray-400">No hay descripción disponible para este proyecto.</span>}
                             </p>
-                            <button
-                                onClick={() => setEditing(true)}
-                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                            >
-                                Editar
-                            </button>
-                        </>
+                        </div>
                     )}
                 </div>
 
